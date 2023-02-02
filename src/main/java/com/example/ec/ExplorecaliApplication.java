@@ -22,24 +22,27 @@ import static com.fasterxml.jackson.annotation.PropertyAccessor.FIELD;
 @SpringBootApplication
 public class ExplorecaliApplication implements CommandLineRunner {
 
-	@Autowired
-	private TourPackageService tourPackageService;
+	@Value("${ec.importfile}")
+	private String importFile;
 
 	@Autowired
+	private TourPackageService tourPackageService;
+	@Autowired
 	private TourService tourService;
+
 	public static void main(String[] args) {
 		SpringApplication.run(ExplorecaliApplication.class, args);
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
-		createTourPackages();
-		long numOfTourPackages = tourPackageService.total();
-		createTours("ExploreCalifornia.json");
-		long numOfTours = tourService.total();
+		createTourAllPackages();
+		createTours(importFile);
 	}
-
-	private void createTourPackages(){
+	/**
+	 * Initialize all the known tour packages
+	 */
+	private void createTourAllPackages(){
 		tourPackageService.createTourPackage("BC", "Backpack Cal");
 		tourPackageService.createTourPackage("CC", "California Calm");
 		tourPackageService.createTourPackage("CH", "California Hot springs");
@@ -50,6 +53,10 @@ public class ExplorecaliApplication implements CommandLineRunner {
 		tourPackageService.createTourPackage("SC", "Snowboard Cali");
 		tourPackageService.createTourPackage("TC", "Taste of California");
 	}
+
+	/**
+	 * Create tour entities from an external file
+	 */
 	private void createTours(String fileToImport) throws IOException {
 		TourFromFile.read(fileToImport).forEach(importedTour ->
 				tourService.createTour(importedTour.getTitle(),
@@ -64,6 +71,9 @@ public class ExplorecaliApplication implements CommandLineRunner {
 						importedTour.getRegion()));
 	}
 
+	/**
+	 * Helper class to import ExploreCalifornia.json
+	 */
 	private static class TourFromFile {
 		//fields
 		private String packageType, title, description, blurb, price, length,
