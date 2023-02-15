@@ -10,7 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/tours/{tourId}/ratings")
@@ -35,7 +38,19 @@ public class TourRatingController {
         tourRatingRepository.save(new TourRating(new TourRatingPk(tour, ratingdto.getCustomerId()),
                 ratingdto.getScore(), ratingdto.getComment()));
     }
-
+    @GetMapping
+    public List<Ratingdto> getAllRatingsForTour(@PathVariable(value = "tourId ") int tourId) {
+        verifyTour(tourId);
+        return tourRatingRepository.findByPkTourId(tourId).stream()
+                .map(Ratingdto::new).collect(Collectors.toList());
+    }
+    @GetMapping(path="/average")
+    public Map<String, Double> getAverage(@PathVariable(value = "tourId ") int tourId) {
+        verifyTour(tourId);
+        return Map.of("average", tourRatingRepository.findByPkTourId(tourId).stream()
+                                    .mapToInt(TourRating::getScore).average()
+                                    .orElseThrow(()-> new NoSuchElementException("Tour has no ratings")));
+    }
     /**
      * Verify and return the Tour given a tourId.
      *

@@ -1,5 +1,6 @@
 package com.example.ec.web;
 
+import com.example.ec.domain.TourRating;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -21,6 +22,9 @@ public class Ratingdto {
     }
 
     public Ratingdto() {
+    }
+
+    public Ratingdto(TourRating tourRating) {
     }
 
     public Integer getScore() {
