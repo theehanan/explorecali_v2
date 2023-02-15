@@ -51,6 +51,65 @@ public class TourRatingController {
                                     .mapToInt(TourRating::getScore).average()
                                     .orElseThrow(()-> new NoSuchElementException("Tour has no ratings")));
     }
+
+    /**
+     * Update score and comment of a Tour Rating
+     *
+     * @param tourId tour identifier
+     * @param ratingDto rating Data Transfer Object
+     * @return The modified Rating DTO.
+     */
+    @PutMapping
+    public Ratingdto updateWithPut(@PathVariable(value = "tourId") int tourId, @RequestBody @Validated Ratingdto ratingDto) {
+        TourRating rating = verifyTourRating(tourId, ratingDto.getCustomerId());
+        rating.setScore(ratingDto.getScore());
+        rating.setComment(ratingDto.getComment());
+        return new Ratingdto(tourRatingRepository.save(rating));
+    }
+    /**
+     * Update score or comment of a Tour Rating
+     *
+     * @param tourId tour identifier
+     * @param ratingDto rating Data Transfer Object
+     * @return The modified Rating DTO.
+     */
+    @PatchMapping
+    public Ratingdto updateWithPatch(@PathVariable(value = "tourId") int tourId, @RequestBody @Validated Ratingdto ratingDto) {
+        TourRating rating = verifyTourRating(tourId, ratingDto.getCustomerId());
+        if (ratingDto.getScore() != null) {
+            rating.setScore(ratingDto.getScore());
+        }
+        if (ratingDto.getComment() != null) {
+            rating.setComment(ratingDto.getComment());
+        }
+        return new Ratingdto(tourRatingRepository.save(rating));
+    }
+
+    /**
+     * Delete a Rating of a tour made by a customer
+     *
+     * @param tourId tour identifier
+     * @param customerId customer identifier
+     */
+    @DeleteMapping(path = "/{customerId}")
+    public void delete(@PathVariable(value = "tourId") int tourId, @PathVariable(value = "customerId") int customerId) {
+        TourRating rating = verifyTourRating(tourId, customerId);
+        tourRatingRepository.delete(rating);
+    }
+
+    /**
+     * Verify and return the TourRating for a particular tourId and Customer
+     * @param tourId tour identifier
+     * @param customerId customer identifier
+     * @return the found TourRating
+     * @throws NoSuchElementException if no TourRating found
+     */
+    private TourRating verifyTourRating(int tourId, int customerId) throws NoSuchElementException {
+        return tourRatingRepository.findByPkTourIdAndPkCustomerId(tourId, customerId).orElseThrow(() ->
+                new NoSuchElementException("Tour-Rating pair for request("
+                        + tourId + " for customer" + customerId));
+    }
+
     /**
      * Verify and return the Tour given a tourId.
      *
