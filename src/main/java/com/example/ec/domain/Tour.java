@@ -1,15 +1,14 @@
 package com.example.ec.domain;
 
 import jakarta.persistence.*;
-
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-public class Tour {
-
+public class Tour implements Serializable{
     @Id
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Column
     private String title;
@@ -34,19 +33,18 @@ public class Tour {
 
 
     @ManyToOne
+    @JoinColumn(name="tour_package_code")
     private TourPackage tourPackage;
 
     @Column
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Difficulty difficulty;
 
     @Column
-    @Enumerated
     private Region region;
 
-    public Tour(String title, String description, String blurb, Integer price,
-                String duration, String bullets, String keywords, TourPackage tourPackage,
-                Difficulty difficulty, Region region) {
+    public Tour(String title, String description, String blurb, Integer price, String duration, String bullets,
+                String keywords, TourPackage tourPackage, Difficulty difficulty, Region region) {
         this.title = title;
         this.description = description;
         this.blurb = blurb;
@@ -59,15 +57,53 @@ public class Tour {
         this.region = region;
     }
 
-    protected Tour() {}
-
-    public void setId(Long id) {
-        this.id = id;
+    protected Tour() {
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getBlurb() {
+        return blurb;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public String getBullets() {
+        return bullets;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public TourPackage getTourPackage() {
+        return tourPackage;
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public Region getRegion() {
+        return region;
+    }
+
     @Override
     public String toString() {
         return "Tour{" +
